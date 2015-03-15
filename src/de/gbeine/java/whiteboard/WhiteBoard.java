@@ -1,33 +1,3 @@
-/*
- * WhiteBoard.java
- *
- * First created on 24. Februar 2003, 11:09
- * Revision history
- * $Log: WhiteBoard.java,v $
- * Revision 1.7  2003/04/29 14:36:20  georg
- * Fehler beim  windowExited Flag behoben
- * removeShape ge�ndert: initiiert kein repaint, sondern vertraut
- * auf die n�chste draw... Methode. => reduziertes Flickern.
- * Daf�r neue Methode wipeShape, die repaint aufruft.
- *
- * Revision 1.6  2003/04/19 14:40:32  georg
- * no message
- *
- * Revision 1.5  2003/04/17 18:05:34  georg
- * WhiteBoard wird automatisch neu aufgebaut,
- * falls der User den Frame geschlossen hat.
- *
- * Revision 1.4  2003/04/17 17:37:05  georg
- * Frame-Konstruktion aus Konstruktor ausgelagert
- *
- * Revision 1.3  2003/04/17 11:44:38  georg
- * Umstellung von Vererbung von JComponent auf Verwendung von JComponent
- *
- * Revision 1.2  2003/04/17 09:52:07  georg
- * Umstellung auf Threadsafe Collection
- *
- */
-
 package de.gbeine.java.whiteboard;
 
 import java.awt.*;
@@ -36,22 +6,20 @@ import java.awt.geom.*;
 import javax.swing.*;
 import java.util.*;
 
-/** Eine grafische Zeichenfl�che, auf der einfache
- * Grundoperationen zum Zeichnen geometrischer Formen
- * ausgef�hrt werden k�nnen.<br>
- * Es stehen Methoden zum Zeichnen von Punkten, Geraden,
- * Rechtecken, Polygonen, Ellipsen und Parabelsegmenten zur Verf�gung.<br>
- * Alle Zeichenmethoden liefern ein  Objekt zur�ck, z.B.
- * {@link WhiteBoard#drawLine(double, double, double, double)}, dass f�r
- * die removeShape-Methode "aufgehoben" werden mu�, siehe {@link #removeShape(Object)}
+/**
+ * A graphical drawing board to perform basic operations on geometrical forms.
+ *
+ * WhiteBoard offers methods to draw points, lines, rectangles, polygones,
+ * ellipses and parabolas. All drawing methods return an object that can be
+ * removed using removeShape from the board.
  * @author $Author Georg Beier$
  * @version $Revision: 1.7 $ vom $Date: 2003/04/29 14:36:20 $
  */
 public class WhiteBoard {
 
-    /** Das �u�ere Fenster */
+    /** Das äußere Fenster */
     private JFrame frame;
-    /** Die "Arbeitsfl�che" im �u�eren Fenster */
+    /** Die "Arbeitsfläche" im äußeren Fenster */
     private Container container;
     /** inneres Fenster mit Rollbalken */
     private JScrollPane scrollPane;
@@ -60,7 +28,7 @@ public class WhiteBoard {
     /** Flag das angibt, ob Fenster geschlossen wurde */
     private boolean windowExited = false;
     /** Action Listener Objekt, dass auf das WindowClose
-     * Ereignis des �u�eren Frame reagiert.
+     * Ereignis des äußeren Frame reagiert.
      */
     private WindowListener closeListener;
     /** Koordinaten der Randpunkte */
@@ -72,7 +40,7 @@ public class WhiteBoard {
     /** Koordinaten der Randpunkte */
     private double  maxY;
 
-    /** Komponente, die die eigentliche Darstellung �bernimmt. */
+    /** Komponente, die die eigentliche Darstellung übernimmt. */
     private JComponent graphicalComponent = new DrawingArea();
 
     /** Legt ein neues WhiteBoard-Objekt an. Dieses wird automatisch
@@ -89,7 +57,7 @@ public class WhiteBoard {
         initFrame();
     }
 
-    /** Legt alle zum Zeichnen ben�tigten Objekte an */
+    /** Legt alle zum Zeichnen benötigten Objekte an */
     private void initFrame() {
         frame = new JFrame("WhiteBoard");
         container = frame.getContentPane();
@@ -105,9 +73,9 @@ public class WhiteBoard {
         graphicalComponent.repaint();
     }
 
-    /** Neuberechnung der Gr��e der Zeichenfl�che. Dazu werden alle Shapes
+    /** Neuberechnung der Größe der Zeichenfläche. Dazu werden alle Shapes
      * durchgearbeitet.
-     * @return gibt an, ob sich die Gr��e ge�ndert hat
+     * @return gibt an, ob sich die Größe geändert hat
      */
     private boolean recomputeBounds() {
         AttributedShape as;
@@ -154,18 +122,18 @@ public class WhiteBoard {
         return boundsChanged;
     }
 
-    /** Neuberechnung der Gr��e der Zeichenfl�che, wenn ein Shape hinzugef�gt wurde
-     * @return gibt an, ob sich die Gr��e ge�ndert hat
-     * @param s hinzugef�gtes Zeichnungselement
+    /** Neuberechnung der Größe der Zeichenfläche, wenn ein Shape hinzugefügt wurde
+     * @return gibt an, ob sich die Größe geändert hat
+     * @param s hinzugefügtes Zeichnungselement
      */
     private boolean recomputeBounds(Shape s) {
         return recomputeBounds(s, 0.);
     }
 
-    /** Neuberechnung der Gr��e der Zeichenfl�che, wenn ein gedrehtes Zeichnungselement
-     * hinzugef�gt wird.
-     * @return gibt an, ob sich die Gr��e ge�ndert hat
-     * @param s hinzugef�gtes Zeichnungselement
+    /** Neuberechnung der Größe der Zeichenfläche, wenn ein gedrehtes Zeichnungselement
+     * hinzugefügt wird.
+     * @return gibt an, ob sich die Größe geändert hat
+     * @param s hinzugefügtes Zeichnungselement
      * @param rotation Drehung des Zeichenelements
      */
     private boolean recomputeBounds(Shape s, double rotation) {
@@ -176,7 +144,6 @@ public class WhiteBoard {
             double dy = r.getHeight();
             int diag = (int) Math.ceil( Math.sqrt(dx * dx + dy * dy));
             p.translate(-diag / 2, -diag / 2);
-//            r = new Rectangle(p, new Dimension(diag, diag));
             r = new Rectangle(p, new Dimension(10 * diag / 7, 10 * diag / 7));
         }
         double x1 = r.getMinX();
@@ -209,8 +176,8 @@ public class WhiteBoard {
      * @param yfrom y Startkoordinate
      * @param xto x Zielkoordinate
      * @param yto y Zielkoordinate
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public Object drawLine(double xfrom, double yfrom, double xto, double yto) {
         return drawLine(xfrom, yfrom, xto, yto, Color.BLACK);
@@ -222,8 +189,8 @@ public class WhiteBoard {
      * @param xto x Zielkoordinate
      * @param yto y Zielkoordinate
      * @param color Linienfarbe. {@link java.awt.Color}
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public  Object drawLine(double xfrom, double yfrom, double xto, double yto, Color color) {
         Shape s = new Line2D.Double(xfrom, yfrom,  xto, yto);
@@ -236,8 +203,8 @@ public class WhiteBoard {
     }
 
     /** Zeichnet einen parabolischen Bogen in default-Farbe.
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      * @param xfrom x Startkoordinate
      * @param yfrom y Startkoordinate
      * @param xto x Zielkoordinate
@@ -248,16 +215,16 @@ public class WhiteBoard {
         return drawArc(xfrom, yfrom,  xto, yto, excentricity, Color.BLACK, false);
     }
 
-    /** Zeichnet einen farbigen, evtl. gef�llten parabolischen Bogen.
+    /** Zeichnet einen farbigen, evtl. gefüllten parabolischen Bogen.
      * @param xfrom x Startkoordinate
      * @param yfrom y Startkoordinate
      * @param xto x Zielkoordinate
      * @param yto y Zielkoordinate
      * @param excentricity maximale Auslenkung des Bogens aus der Verbindungsgerade
      * @param color Linienfarbe. {@link java.awt.Color}
-     * @param solid true, wenn Zeichnungsobjekt gef�llt werden soll.
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @param solid true, wenn Zeichnungsobjekt gefüllt werden soll.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public  Object drawArc(double xfrom, double yfrom, double xto, double yto, double excentricity, Color color, boolean solid) {
         double xs, ys, d, dx, dy, r, exx, exy;
@@ -281,8 +248,8 @@ public class WhiteBoard {
     /** Zeichnet einen schwarzen Punkt
      * @param x Koordinate
      * @param y Koordinate
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public Object drawPoint(double x, double y) {
         return drawPoint(x, y,  Color.BLACK);
@@ -292,8 +259,8 @@ public class WhiteBoard {
      * @param x Koordinate
      * @param y Koordinate
      * @param color Linienfarbe. {@link java.awt.Color}
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public  Object drawPoint(double x, double y, Color color) {
         rebuild();
@@ -310,8 +277,8 @@ public class WhiteBoard {
      * @param y Mittelpunkts-Koordinate
      * @param hx x Achse
      * @param hy y Achse
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public Object drawEllipse(double x, double y, double hx, double hy) {
         return drawEllipse(x, y, hx, hy, Color.BLACK, false, 0.0);
@@ -323,10 +290,10 @@ public class WhiteBoard {
      * @param hx x Achse
      * @param hy y Achse
      * @param color Linienfarbe. {@link java.awt.Color}
-     * @param solid true, wenn Zeichnungsobjekt gef�llt werden soll.
-     * @param rotation Drehung des Objekts, Winkel im Bogenma�!
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @param solid true, wenn Zeichnungsobjekt gefüllt werden soll.
+     * @param rotation Drehung des Objekts, Winkel im Bogenmaß!
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public  Object drawEllipse(double x, double y, double hx, double hy, Color color, boolean solid, double rotation) {
         rebuild();
@@ -343,8 +310,8 @@ public class WhiteBoard {
      * wird intern mit <code>int</code> gerechnet und entsprechend gerundet!
      * @param x Eckpunkt-Koordinaten x
      * @param y Eckpunkt-Koordinaten y
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public Object drawPolygon(double[] x, double[] y) {
         return drawPolygon(x, y, Color.BLACK, false, 0.0);
@@ -356,10 +323,10 @@ public class WhiteBoard {
      * @param x Eckpunkt-Koordinaten x
      * @param y Eckpunkt-Koordinaten y
      * @param color Linienfarbe. {@link java.awt.Color}
-     * @param solid true, wenn Zeichnungsobjekt gef�llt werden soll.
-     * @param rotation Drehung des Objekts, Winkel im Bogenma�!
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @param solid true, wenn Zeichnungsobjekt gefüllt werden soll.
+     * @param rotation Drehung des Objekts, Winkel im Bogenmaß!
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public  Object drawPolygon(double[] x, double y[], Color color, boolean solid, double rotation) {
         rebuild();
@@ -380,10 +347,10 @@ public class WhiteBoard {
     /** Zeichnet ein schwarzes Rechteck
      * @param x Mittelpunkts-Koordinate
      * @param y Mittelpunkts-Koordinate
-     * @param hx x Seitenl�nge
-     * @param hy y Seitenl�nge
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @param hx x Seitenlänge
+     * @param hy y Seitenlönge
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public Object drawRectangle(double x, double y, double hx, double hy) {
         return drawRectangle(x, y, hx, hy, Color.BLACK, false, 0.0);
@@ -392,13 +359,13 @@ public class WhiteBoard {
     /** Zeichnet ein farbiges Rechteck
      * @param x Mittelpunkts-Koordinate
      * @param y Mittelpunkts-Koordinate
-     * @param hx x Seitenl�nge
-     * @param hy y Seitenl�nge
+     * @param hx x Seitenlänge
+     * @param hy y Seitenlänge
      * @param color Linienfarbe. {@link java.awt.Color}
-     * @param solid true, wenn Zeichnungsobjekt gef�llt werden soll.
-     * @param rotation Drehung des Objekts, Winkel im Bogenma�!
-     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benoetigt, um das
-     * Objekt wieder zu loeschen.
+     * @param solid true, wenn Zeichnungsobjekt gefüllt werden soll.
+     * @param rotation Drehung des Objekts, Winkel im Bogenmaß!
+     * @return Referenz auf das intern verwendete Zeichnungsobjekt. Wird benötigt, um das
+     * Objekt wieder zu löschen.
      */
     public  Object drawRectangle(double x, double y, double hx, double hy, Color color, boolean solid, double rotation) {
         rebuild();
@@ -410,9 +377,9 @@ public class WhiteBoard {
         return as;
     }
 
-    /** Loescht ein Objekt nur aus der internen Speicherstruktur.
-     * gObjekt wird nicht von der Zeichenfl�che gel�scht, dies geschieht
-     * erst beim n�chsten redraw. Dadurch wird ein Flickern beim Bewegen von
+    /** Löscht ein Objekt nur aus der internen Speicherstruktur.
+     * gObjekt wird nicht von der Zeichenfläche gelöscht, dies geschieht
+     * erst beim nächsten redraw. Dadurch wird ein Flickern beim Bewegen von
      * Objekten vermieden.
      * @param o Referenz auf das interne Zeichenobjekt
      */
@@ -420,8 +387,8 @@ public class WhiteBoard {
         shapes.remove(o);
     }
 
-    /** Loescht ein Objekt aus der internen Speicherstruktur und von
-     * der Zeichenfl�che. F�hrt zu Bildschirmflickern, wenn diese Methode
+    /** Löscht ein Objekt aus der internen Speicherstruktur und von
+     * der Zeichenfläche. Führt zu Bildschirmflickern, wenn diese Methode
      * zum Bewegen von Objekten verwendet wird.
      * @param o Referenz auf das interne Zeichenobjekt
      */
@@ -433,10 +400,10 @@ public class WhiteBoard {
     }
 
     /**
-     * Methode zum @Demonstrieren und Testen der Zeichenmoeglichkeiten von WhiteBoard.<br>
+     * Methode zum @Demonstrieren und Testen der Zeichenmöglichkeiten von WhiteBoard.<br>
      * In der Methode actionPerformed des JButton sieht man, wie ein Objekt von der
-     * Zeichenfl�che wieder geloescht wird.<br>
-     * Die �brigen Statements zeigen, wie unterschiedliche Objekte gezeichnet werden.
+     * Zeichenfläche wieder gelöscht wird.<br>
+     * Die übrigen Statements zeigen, wie unterschiedliche Objekte gezeichnet werden.
      */
     public void demo() {
         JButton b = new JButton("weg mit der Form");
@@ -494,7 +461,7 @@ public class WhiteBoard {
         mainShapes.add(this.drawArc(570, 570, 530, 230, 70));
     }
 
-    /** Test- Mainmethode f�r Klasse WhiteBoard
+    /** Test- Mainmethode für Klasse WhiteBoard
      * @param args Kommandozeilenparameter (ignoriert)
      */
     public static void main(String[] args) {
@@ -530,11 +497,11 @@ public class WhiteBoard {
         }
     }
 
-    /** Innere Klasse stellt die aktuelle Zeichenfl�che zur Verf�gung. */
+    /** Innere Klasse stellt die aktuelle Zeichenfläche zur Verfügung. */
     private class DrawingArea extends JComponent {
-    /** stellt die Zeichenfl�che mit allen enthaltenen grafischen
+    /** stellt die Zeichenfläche mit allen enthaltenen grafischen
      * Objekten neu dar. Wird automatisch aufgerufen, wenn das
-     * Window neu gezeichnet werden mu�. Wird auch indirekt �ber repaint() oder
+     * Window neu gezeichnet werden muß. Wird auch indirekt über repaint() oder
      * revalidate aufgerufen.
      * @param g neues, vom Windowsystem bereitgestelltes Grafics-Objekt, auf dem das Whiteboard
      * neu aufgebaut wird.
@@ -569,9 +536,9 @@ public class WhiteBoard {
         }
     }
 
-    /** gibt gew�nschte Groe�e in Bildschirmeinheiten an. Wird von ScrollPane benutzt, um
+    /** gibt gewünschte Größe in Bildschirmeinheiten an. Wird von ScrollPane benutzt, um
      * Rollbalken zu berechnen.
-     * @return Groe�e der Zeichenfl�che.
+     * @return Größe der Zeichenfläche.
      */
     public Dimension getPreferredSize() {
         return new Dimension((int) (maxX-minX+3), (int) (maxY-minY+3));
