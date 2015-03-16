@@ -1,4 +1,4 @@
-package de.gbeine.java.whiteboard;
+package teaching;
 
 import java.awt.*;
 import java.awt.event.*;
